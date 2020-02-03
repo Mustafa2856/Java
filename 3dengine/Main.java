@@ -16,7 +16,7 @@ public class Main extends JFrame {
     
     private void initUI() {
         
-        add(new engine());
+        add(new dengine());
         setResizable(false);
         pack();
         setTitle("3d");
