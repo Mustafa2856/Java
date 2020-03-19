@@ -90,7 +90,7 @@ public class ui extends JPanel implements ActionListener {
         add(ModList);
         //add(List);
 
-        print.setText("Print");
+        print.setText("Print Bill");
         Pricelabel.setText("Price :      Rs.");
         Price.setText("0");
         Itemlabel.setText("Item :");
@@ -108,15 +108,13 @@ public class ui extends JPanel implements ActionListener {
         Itemselect.addActionListener((java.awt.event.ActionEvent evt) -> {
             itemSelectedActionPerformed(evt);
         });
+        print.addActionListener((java.awt.event.ActionEvent evt)-> {
+            printbill();
+        });
         Itemselect.setEditable(true);
         ComboBoxEditor cd = Itemselect.getEditor();
         try {
             FileWriter fr = new FileWriter("list.olb");
-            BufferedWriter br = new BufferedWriter(fr);
-            PrintWriter pr = new PrintWriter(br);
-            
-            pr.close();
-            br.close();
             fr.close();
         } catch (Exception exp) {
             System.out.println(exp);
@@ -166,6 +164,7 @@ public class ui extends JPanel implements ActionListener {
         AddItem.setBounds(400, 95, 120, 30);
         ModList.setBounds(20, 95, 200, 30);
         tableScroll.setBounds(20, 150, 1000, 450);
+        print.setBounds(720,95,100,30);
 
     }
 
@@ -214,14 +213,13 @@ public class ui extends JPanel implements ActionListener {
         int si = Itemselect.getSelectedIndex();
         String price = "0";
         if (si != -1) {
-            System.out.println(si);
+            
             String sitem = Itemselect.getSelectedItem().toString();
             try {
                 Scanner sc = new Scanner(new File("Itemlist.olb"));
                 while (sc.hasNext()) {
                     String it = sc.nextLine();
                     String p = sc.nextLine();
-                    System.out.println(p);
                     if (it.equals(sitem)) {
                         price = p;
                     }
@@ -319,7 +317,49 @@ public class ui extends JPanel implements ActionListener {
     }
 
     private void printbill() {
-
+        try{
+            FileWriter fr = new FileWriter("a.pr");
+            BufferedWriter br = new BufferedWriter(fr);
+            PrintWriter pr = new PrintWriter(br);
+            pr.println("#Rect:-: 0 0 W 100");
+            pr.println("#String:-: 20 20");
+            pr.println("Store Name");
+            pr.println("#String:-: 20 150");
+            pr.println("Items");
+            pr.println("#String:-: 150 150");
+            pr.println("Quantity");
+            pr.println("#String:-: 220 150");
+            pr.println("Price");
+            pr.println("#String:-: 280 150");
+            pr.println("Total");
+            Scanner sc = new Scanner(new File("list.olb"));
+            int i=0;double total=0;
+            while(sc.hasNext()){
+                String item = sc.nextLine();
+                String price = sc.nextLine();
+                String qty = sc.nextLine();
+                pr.println("#String:-: 20 "+Integer.toString(i*30+180));
+                pr.println(item);
+                pr.println("#String:-: 150 "+Integer.toString(i*30+180));
+                pr.println(qty);
+                pr.println("#String:-: 220 "+Integer.toString(i*30+180));
+                pr.println(price);
+                pr.println("#String:-: 280 "+Integer.toString(i*30+180));
+                pr.println(Double.toString(Double.valueOf(qty)*Double.valueOf(price)));
+                total+=Double.valueOf(qty)*Double.valueOf(price);
+                i++;
+            }
+            pr.println("#Rect:-: 15 120 130 "+Integer.toString(i*30+50));
+            pr.println("#Rect:-: 145 120 70 "+Integer.toString(i*30+50));
+            pr.println("#Rect:-: 215 120 60 "+Integer.toString(i*30+50));
+            pr.println("#Rect:-: 275 120 55 "+Integer.toString(i*30+50));
+            pr.println("#String:-: 20 "+Integer.toString(i*30+200));
+            pr.println("Total: "+Double.toString(total));
+            sc.close();
+            pr.close();
+            br.close();
+            fr.close();
+        }catch(Exception e){System.out.println(e);}
         Printer a = new Printer();
     }
 
@@ -335,6 +375,7 @@ public class ui extends JPanel implements ActionListener {
         g.drawRect(10, 10, 1330, 630);
         g.drawRect(10, 10, 520, 125);
         g.drawRect(530,10,300,60);
+        g.drawRect(530,70,300,65);
         g.drawString("Total: Rs. "+Double.toString(Math.round(total*100)/100.0),550,50);
     }
 

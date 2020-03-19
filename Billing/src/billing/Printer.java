@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.print.*;
 import static java.awt.print.Printable.NO_SUCH_PAGE;
 import static java.awt.print.Printable.PAGE_EXISTS;
+import java.io.File;
 import java.util.Scanner;
 
 public class Printer implements Printable {
@@ -41,14 +42,16 @@ public class Printer implements Printable {
          */
         Graphics2D g2d = (Graphics2D)g;
         g2d.translate(pf.getImageableX(), pf.getImageableY());
-        Scanner sc = new Scanner("a.pr");
+        try{
+        Scanner sc = new Scanner(new File("a.pr"));
         while(sc.hasNext()){
             String a = sc.nextLine();
             if(a.startsWith("#String:-: ")){
-                int x = Integer.parseInt(a.substring(10,a.indexOf(' ',10)));
-                int y = Integer.parseInt(a.substring(a.indexOf(' ',10),a.indexOf(' ',a.indexOf(' ',10))));
+                String l[]=a.substring(11).split(" ");
+                int x = Integer.parseInt(l[0]);
+                int y = Integer.parseInt(l[1]);
                 String s = sc.nextLine();
-                g.drawString(s,x,y);
+                g2d.drawString(s,x,y);
             }
             if(a.startsWith("#Rect:-: ")){
                 a=a.substring(a.indexOf(' '));
@@ -56,11 +59,16 @@ public class Printer implements Printable {
                 String l[] = a.split(" ");
                 int x = Integer.parseInt(l[0]);
                 int y = Integer.parseInt(l[1]);
-                int len = Integer.parseInt(l[2]);
+                int len;
+                if(l[2].equals("W"))
+                    len=(int)pf.getImageableWidth();
+                else
+                len = Integer.parseInt(l[2]);
                 int bre = Integer.parseInt(l[3]);
-                g.drawRect(x,y,len,bre);
+                g2d.drawRect(x,y,len,bre);
             }
         }
+        sc.close();}catch(Exception e){System.out.println(e);}
         return PAGE_EXISTS;
     }
  

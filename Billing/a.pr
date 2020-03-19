@@ -1,0 +1,57 @@
+#Rect:-: 0 0 W 100
+#String:-: 20 20
+Store Name
+#String:-: 20 150
+Items
+#String:-: 150 150
+Quantity
+#String:-: 220 150
+Price
+#String:-: 280 150
+Total
+#String:-: 20 180
+maida 500g
+#String:-: 150 180
+2
+#String:-: 220 180
+50
+#String:-: 280 180
+100.0
+#String:-: 20 210
+good day
+#String:-: 150 210
+7
+#String:-: 220 210
+9.5
+#String:-: 280 210
+66.5
+#String:-: 20 240
+maida 200g
+#String:-: 150 240
+5
+#String:-: 220 240
+19
+#String:-: 280 240
+95.0
+#String:-: 20 270
+maida 100g
+#String:-: 150 270
+3
+#String:-: 220 270
+10
+#String:-: 280 270
+30.0
+#String:-: 20 300
+maida 1kg
+#String:-: 150 300
+1
+#String:-: 220 300
+95
+#String:-: 280 300
+95.0
+#Rect:-: 15 120 130 200
+#Rect:-: 145 120 70 200
+#Rect:-: 215 120 60 200
+#Rect:-: 275 120 55 200
+#String:-: 20 350
+Total: 386.5

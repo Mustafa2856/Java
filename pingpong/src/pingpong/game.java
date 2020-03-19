@@ -57,8 +57,8 @@ public class game extends JPanel implements ActionListener{
         g.drawString(Integer.toString(cp)+" : ",220,30);
         g.fillRect(0,0,500,10);
         g.fillRect(0,490,500,10);
-        g.fillRect(10,cposition-30,15,60);
-        g.fillRect(475,pposition-30,15,60);
+        g.fillRoundRect(10,cposition-30,15,60,15,15);
+        g.fillRoundRect(475,pposition-30,15,60,15,15);
         g.fillOval(ball[0]-5,ball[1]-5,10,10);
     }
     
@@ -81,6 +81,7 @@ public class game extends JPanel implements ActionListener{
         }
         ball[0]+=vel[0];
         ball[1]+=vel[1];
+        
         if(vel[0]<0 && ball[0]<400){
             int hd = ball[0]-25;
             int vd = ball[1]-(hd/vel[0])*vel[1];
@@ -88,20 +89,20 @@ public class game extends JPanel implements ActionListener{
             vd=vd>0?vd:-vd;
             vd=vd>490?980-vd:vd;
                     }
-            if(cposition-vd>10)
+            if(cposition-vd>20)
                 cposition-=3*vell/4;
             else if(vd-cposition>10)
                 cposition+=3*vell/4;
         }
-        //comment this for multiplayer
+        //comment this for sim
         /*if(vel[0]>0 && ball[0]>100){
             int hd = 475-ball[0];
-            int vd = ball[1]-(hd/vel[0])*vel[1];
+            int vd = ball[1]+(hd/vel[0])*vel[1];
             for(int i=0;i<5;i++){
             vd=vd>0?vd:-vd;
             vd=vd>490?980-vd:vd;
                     }
-            if(pposition-vd>10)
+            if(pposition-vd>20)
                 pposition-=3*vell/4;
             else if(vd-pposition>10)
                 pposition+=3*vell/4;
@@ -118,13 +119,22 @@ public class game extends JPanel implements ActionListener{
         public void keyPressed(KeyEvent e) {
 
             int key = e.getKeyCode();
-            if(key==KeyEvent.VK_W || key==KeyEvent.VK_UP || key==KeyEvent.VK_NUMPAD8)
+            if(key==KeyEvent.VK_W || key==KeyEvent.VK_UP)
             {
                 if(pposition>35)
                 pposition-=5;repaint();
             }
-            if(key==KeyEvent.VK_S || key==KeyEvent.VK_DOWN || key==KeyEvent.VK_NUMPAD2)
+            if(key==KeyEvent.VK_NUMPAD8)
             {
+                if(pposition>35)
+                pposition-=5;repaint();
+            }
+            if(key==KeyEvent.VK_S || key==KeyEvent.VK_DOWN)
+            {
+                if(pposition<465)
+                pposition+=5;repaint();
+            }
+            if(key==KeyEvent.VK_NUMPAD2){
                 if(pposition<465)
                 pposition+=5;repaint();
             }

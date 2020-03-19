@@ -24,7 +24,7 @@ public class dengine extends JPanel implements ActionListener{
     
     point cam,frontv,upv,sidev;
     obj o;
-    Timer t;double time=0,radiusr=25;
+    Timer t;double time=0,radiusr=5;long efficiency=0;
     
     public dengine(){
         cam = new point(0,0,0);
@@ -40,8 +40,8 @@ public class dengine extends JPanel implements ActionListener{
         setFocusable(true);
         setPreferredSize(new Dimension(500,500));
         abcd();
-        t = new Timer(50,this);
-        t.start();
+        /*t = new Timer(50,this);
+        t.start();*/
     }
     
     public void abcd()
@@ -138,7 +138,7 @@ public class dengine extends JPanel implements ActionListener{
         Vector normals = new Vector();
         obj(){
             try{
-                Scanner s = new Scanner(new File("teadybear.obj"));int flag=0;
+                Scanner s = new Scanner(new File("teapot.obj"));int flag=0;
                 while(s.hasNext())
                 {
                     String a = s.nextLine();
@@ -236,7 +236,8 @@ public class dengine extends JPanel implements ActionListener{
             g.setColor(f);
             g.fillPolygon(x,y,s);}
             }
-
+        g.setColor(Color.BLACK);
+        g.drawString(Long.toString(efficiency),150,-200);
     }
     
     @Override
@@ -255,6 +256,7 @@ public class dengine extends JPanel implements ActionListener{
         public void keyPressed(KeyEvent e) {
 
             int key = e.getKeyCode();
+            long time = System.currentTimeMillis();
             if(key==KeyEvent.VK_NUMPAD8){
                 cam.x+=upv.x*.01;
                 cam.y+=upv.y*.01;
@@ -307,6 +309,7 @@ public class dengine extends JPanel implements ActionListener{
                 rotate(0,-1);
                 abcd();repaint();
             }
+            efficiency=System.currentTimeMillis()-time;repaint();
         }
     }
 }
