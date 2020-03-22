@@ -16,7 +16,7 @@ public class Main extends JFrame {
     
     private void initUI() {
         
-        add(new dengine());
+        add(new dengine("teadybear.obj"));
         setResizable(false);
         pack();
         setTitle("3d");

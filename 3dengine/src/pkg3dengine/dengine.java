@@ -22,23 +22,26 @@ import java.io.*;
  */
 public class dengine extends JPanel implements ActionListener{
     
-    point cam,frontv,upv,sidev;
+    point cam,frontv,upv,sidev;double speed=0.05;
     obj o;
-    Timer t;double time=0,radiusr=5;long efficiency=0;
-    
-    public dengine(){
+    Timer t;double time=0,radiusr=5;long efficiency=0;Vector points = new Vector();
+        Vector<Face> tris = new Vector();
+        Vector normals = new Vector();
+    int first=0;
+    public dengine(String s){
         cam = new point(0,0,0);
         frontv = new point(0,0,1);
         upv = new point(0,1,0);
         sidev = new point(1,0,0);
-        initComponents();
+        initComponents(s);
     }
     
-    private void initComponents(){
+    private void initComponents(String s){
         setVisible(true);addKeyListener(new TA());
-        setBackground(Color.WHITE);
+        setBackground(Color.BLACK);
         setFocusable(true);
         setPreferredSize(new Dimension(500,500));
+        obj o = new obj(s);
         abcd();
         /*t = new Timer(50,this);
         t.start();*/
@@ -46,7 +49,8 @@ public class dengine extends JPanel implements ActionListener{
     
     public void abcd()
     {
-       o = new obj(); 
+        sorting();
+        
     }
     
     public point cross(point a,point b){
@@ -112,8 +116,9 @@ public class dengine extends JPanel implements ActionListener{
     }
     
     private class Face{
-        Vector points = new Vector();int l;point normal;double depth;
-        Face(Vector p){
+        Vector<point> points = new Vector();int l;point normal;double depth;Vector<point> originalPoints;
+        Face(Vector<point> p){
+            originalPoints=p;
             l=p.size();depth=0;
             point p1 = (point)p.get(0);
             point p2 = (point)p.get(1);
@@ -133,12 +138,10 @@ public class dengine extends JPanel implements ActionListener{
     }
          
     private class obj{
-        Vector points = new Vector();
-        Vector tris = new Vector();
-        Vector normals = new Vector();
-        obj(){
+        
+        obj(String filename){
             try{
-                Scanner s = new Scanner(new File("teapot.obj"));int flag=0;
+                Scanner s = new Scanner(new File(filename));int flag=0;
                 while(s.hasNext())
                 {
                     String a = s.nextLine();
@@ -187,20 +190,83 @@ public class dengine extends JPanel implements ActionListener{
                     }
                 }
                 //sorting faces by depth
-                int size = tris.size();
-                for(int i=0;i<size;i++){
+                sorting();
+                
+            }catch(Exception e){System.out.println(e.toString());}
+        }
+    }
+    
+    private void sorting(){
+        int size = tris.size();
+        for(int i=0;i<size;i++){
+            Vector<point> o = tris.get(i).originalPoints;
+            tris.set(i,new Face(o));
+        }
+                /*for(int i=0;i<size;i++){
                     for(int j=0;j<size-i-1;j++){
-                        double d1 =((Face) tris.get(j)).depth;
-                        double d2 = ((Face)tris.get(j+1)).depth;
+                        double d1 =tris.get(j).depth;
+                        double d2 = tris.get(j+1).depth;
                         if(d1<d2)
                         {
                             tris.set(j,tris.set(j+1,tris.get(j)));
                         }
                     }
                 }
-                
-            }catch(Exception e){System.out.println(e.toString());}
+        int sp=-1;
+        Stack<Integer> lb = new Stack<Integer>();
+        Stack<Integer> ub = new Stack<Integer>();
+        int pos=0;
+        if(size>1){
+            sp++;
+            lb.push(0);
+            ub.push(size-1);
         }
+        while(sp!=-1){
+            int start=lb.pop();
+            int end = ub.pop();
+            sp--;
+            pos=quicksort(start,end,start);
+            
+            if(pos-1>=start){
+                sp++;
+                lb.push(start);
+                ub.push(pos-1);
+            }
+            if(pos+1<=end){
+                sp++;
+                lb.push(pos+1);
+                ub.push(end);
+            }
+        }*/
+        
+        for(int i=0;i<size;i++){
+            int ptr=i-1;
+            Face temp=tris.get(i);
+            while(ptr>=0 && tris.get(ptr).depth<temp.depth){
+                tris.set(ptr+1,tris.get(ptr));
+                ptr--;
+            }
+            tris.set(ptr+1,temp);
+        }
+                
+    }
+    private int quicksort(int start,int end,int pos){
+        int l=start,r=end;
+        while(l<r){
+            while(tris.get(pos).depth>=tris.get(r).depth && pos!=r) r--;
+            if(pos==r)break;
+            if(tris.get(pos).depth<tris.get(r).depth){
+                tris.set(pos,tris.set(r,tris.get(pos)));
+                pos=r;
+            }
+            while(tris.get(pos).depth<=tris.get(l).depth && pos!=l)l++;
+            if(pos==l)break;
+            if(tris.get(pos).depth>tris.get(l).depth){
+                tris.set(pos,tris.set(l,tris.get(pos)));
+                pos=l;
+            }
+        }
+        return pos;
     }
     
     @Override
@@ -210,9 +276,11 @@ public class dengine extends JPanel implements ActionListener{
     }
     
     private void draw(Graphics g){
-        g.translate(250,250);
-        for(int i=0;i<o.tris.size();i++){
-            Face a = (Face)o.tris.get(i);
+        long tm = System.currentTimeMillis();
+        g.translate(250,250);int flag=0;
+        for(int i=0;i<tris.size();i++){
+            flag=0;
+            Face a = (Face)tris.get(i);
             point n=new point(a.normal.x/a.normal.r,a.normal.y/a.normal.r,a.normal.z/a.normal.r);
             int s  = a.l;
             int[] x = new int[s];
@@ -222,7 +290,9 @@ public class dengine extends JPanel implements ActionListener{
                 x[j] = -(int)a1.x;
                 y[j] = -(int)a1.y;
                 xa+=a1.x;ya+=a1.y;za+=a1.z;
+                if(a1.z<0)flag=1;
             }
+            if(flag==1)continue;
             aa = new point(xa/s-cam.x,ya/s-cam.y,ya/s-cam.y);
             aa = new point(aa.x/aa.r,aa.y/aa.r,aa.z/aa.r);
             float v1=(float)dot(n,frontv);
@@ -236,8 +306,9 @@ public class dengine extends JPanel implements ActionListener{
             g.setColor(f);
             g.fillPolygon(x,y,s);}
             }
-        g.setColor(Color.BLACK);
-        g.drawString(Long.toString(efficiency),150,-200);
+        g.setColor(Color.WHITE);
+        tm = System.currentTimeMillis()-tm;try{
+        g.drawString(Long.toString(1000/(efficiency+tm))+" fps",150,-200);}catch(Exception e){}
     }
     
     @Override
@@ -258,40 +329,46 @@ public class dengine extends JPanel implements ActionListener{
             int key = e.getKeyCode();
             long time = System.currentTimeMillis();
             if(key==KeyEvent.VK_NUMPAD8){
-                cam.x+=upv.x*.01;
-                cam.y+=upv.y*.01;
-                cam.z+=upv.z*.01;
+                cam.x+=upv.x*speed;
+                cam.y+=upv.y*speed;
+                cam.z+=upv.z*speed;
                 abcd();repaint();
             }
             if(key==KeyEvent.VK_NUMPAD2){
-                cam.x-=upv.x*.01;
-                cam.y-=upv.y*.01;
-                cam.z-=upv.z*.01;
+                cam.x-=upv.x*speed;
+                cam.y-=upv.y*speed;
+                cam.z-=upv.z*speed;
                 abcd();repaint();
             }
             if(key==KeyEvent.VK_NUMPAD4){
-                cam.x+=sidev.x*.01;
-                cam.y+=sidev.y*.01;
-                cam.z+=sidev.z*.01;
+                cam.x+=sidev.x*speed;
+                cam.y+=sidev.y*speed;
+                cam.z+=sidev.z*speed;
                 abcd();repaint();
             }
             if(key==KeyEvent.VK_NUMPAD6){
-                cam.x-=sidev.x*.01;
-                cam.y-=sidev.y*.01;
-                cam.z-=sidev.z*.01;
+                cam.x-=sidev.x*speed;
+                cam.y-=sidev.y*speed;
+                cam.z-=sidev.z*speed;
                 abcd();repaint();
             }
             if(key==KeyEvent.VK_W){
-                cam.x+=frontv.x*.01;
-                cam.y+=frontv.y*.01;
-                cam.z+=frontv.z*.01;
+                cam.x+=frontv.x*speed;
+                cam.y+=frontv.y*speed;
+                cam.z+=frontv.z*speed;
                 abcd();repaint();
             }
             if(key==KeyEvent.VK_S){
-                cam.x-=frontv.x*.01;
-                cam.y-=frontv.y*.01;
-                cam.z-=frontv.z*.01;
+                cam.x-=frontv.x*speed;
+                cam.y-=frontv.y*speed;
+                cam.z-=frontv.z*speed;
                 abcd();repaint();
+            }
+            if(key==KeyEvent.VK_UP){
+                speed+=.01;
+            }
+            if(key==KeyEvent.VK_DOWN){
+                speed-=.01;
             }
             if(key==KeyEvent.VK_A){
                 rotate(1,0);
@@ -309,7 +386,7 @@ public class dengine extends JPanel implements ActionListener{
                 rotate(0,-1);
                 abcd();repaint();
             }
-            efficiency=System.currentTimeMillis()-time;repaint();
+            efficiency=System.currentTimeMillis()-time;
         }
     }
 }
