@@ -44,9 +44,9 @@ public class Generator extends JPanel implements ActionListener{
 		setBackground(Color.BLACK);
 		prevsteps.push(new Point(0,0));
 		solvsteps.push(new Point(0,0));
+		setLayout(null);
 		t = new Timer(1,this);
 		t.start();
-		setLayout(null);
 	}
 	
 	private void generatemore() {
@@ -109,7 +109,11 @@ public class Generator extends JPanel implements ActionListener{
 				br.close();
 				fr.close();
 			}catch(Exception e) {System.out.println(e);}
-			toggle=1;
+			solve = new JButton();
+			add(solve);
+			solve.addActionListener((e)->{toggle=1;repaint();});
+			solve.setBounds((maze.length+1)*5+50,50,100,25);
+			solve.setText("Solve");
 			t.stop();repaint();
 		}
 	}
@@ -147,8 +151,8 @@ public class Generator extends JPanel implements ActionListener{
 		g.setColor(Color.CYAN);
 		g.fillRect(2,2,(row/2+1)*10,(col/2+1)*10);
 		g.setColor(Color.GREEN);
-		g.drawRect(0, 0, (row/2+1)*10,(col/2+1)*10);
-		g.drawRect(1, 1, (row/2+1)*10,(col/2+1)*10);
+		g.drawRect(0, 0, (row/2+1)*10+1,(col/2+1)*10+1);
+		g.drawRect(1, 1, (row/2+1)*10+1,(col/2+1)*10+1);
 		if(toggle==0) {
 		g.setColor(Color.WHITE);
 		for(int i=0;i<row;i++) {
@@ -164,7 +168,7 @@ public class Generator extends JPanel implements ActionListener{
 					if(maze[i][j]==1) {
 						g.setColor(Color.GREEN);
 						if(i%2==0)
-							g.fillRect((i/2)*10,(j/2+1)*10,10,2);
+							g.fillRect((i/2)*10,(j/2+1)*10,12,2);
 						else
 							g.fillRect((i/2+1)*10,(j/2)*10,2,10);
 					}
@@ -189,7 +193,7 @@ public class Generator extends JPanel implements ActionListener{
 						if(maze[i][j]==1) {
 							g.setColor(Color.GREEN);
 							if(i%2==0)
-								g.fillRect((i/2)*10,(j/2+1)*10,10,2);
+								g.fillRect((i/2)*10,(j/2+1)*10,12,2);
 							else
 								g.fillRect((i/2+1)*10,(j/2)*10,2,10);
 						}
