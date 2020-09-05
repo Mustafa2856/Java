@@ -1,1 +1,1 @@
-Java projects for fun
+Java desktop projects for fun
